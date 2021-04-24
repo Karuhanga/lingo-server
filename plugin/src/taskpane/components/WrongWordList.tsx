@@ -22,7 +22,7 @@ export default class WrongWordList extends React.Component<WrongWordListProps> {
             &nbsp;
             <Button
                 buttonType={ButtonType.icon}
-                iconProps={{ iconName: "Refresh" }}
+                iconProps={{ iconName: !recheckDisabled ? "Refresh" : "HourGlass" }}
                 onClick={recheck}
                 disabled={recheckDisabled}
             >
