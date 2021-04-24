@@ -12,6 +12,7 @@ import "../../../assets/icon-32.png";
 import "../../../assets/icon-80.png";
 import {fixAnsiUtf8Issue} from "../../utils";
 import {WrongWord} from "./SingleWrongWord";
+import {dictionaryManager} from "../hooks/dictionaryManager";
 
 export interface AppProps {
   title: string;
@@ -21,6 +22,7 @@ export interface AppProps {
 export default function App({ title, isOfficeInitialized }: AppProps) {
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
+  const dictionaryManagerStatus = dictionaryManager();
   const [debug] = useState("");
 
   if (!isOfficeInitialized) {
@@ -29,12 +31,18 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     );
   }
 
+  if (!dictionaryManagerStatus.weHaveADictionary) {
+    return (
+        <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
+    )
+  }
+
   function removeWrongWord(wrongWord: string) {
     setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
   }
 
   function runSpellCheck() {
-    if (!checking) {
+    if (dictionaryManagerStatus.weHaveADictionary && !checking) {
       setChecking(true);
       getDocumentWords()
           .then(checkSpellings)
