@@ -1,10 +1,10 @@
 import {useState} from "react";
 
-interface DictionaryManagerStatusInfo {
+interface DictionaryManager {
     weHaveADictionary: boolean;
 }
 
-export function dictionaryManager(): DictionaryManagerStatusInfo {
+export function useDictionaryManager(): DictionaryManager {
     const [weHaveADictionary] = useState(true);
 
     return {weHaveADictionary};

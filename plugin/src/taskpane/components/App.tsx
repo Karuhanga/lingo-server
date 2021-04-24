@@ -10,9 +10,9 @@ import useInterval from "@use-it/interval";
 import "../../../assets/icon-16.png";
 import "../../../assets/icon-32.png";
 import "../../../assets/icon-80.png";
-import {fixAnsiUtf8Issue} from "../../utils";
 import {WrongWord} from "./SingleWrongWord";
-import {dictionaryManager} from "../hooks/dictionaryManager";
+import {useDictionaryManager} from "../hooks/dictionaryManager";
+import {useDocumentManager} from "../hooks/documentManager";
 
 export interface AppProps {
   title: string;
@@ -20,10 +20,13 @@ export interface AppProps {
 }
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
+  const [debug] = useState("");
+
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
-  const dictionaryManagerStatus = dictionaryManager();
-  const [debug] = useState("");
+  const dictionaryManager = useDictionaryManager();
+  const documentManager = useDocumentManager();
+
 
   if (!isOfficeInitialized) {
     return (
@@ -31,7 +34,7 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     );
   }
 
-  if (!dictionaryManagerStatus.weHaveADictionary) {
+  if (!dictionaryManager.weHaveADictionary) {
     return (
         <Progress title="Setting up..." logo="assets/logo.png" message="Downloading your dictionary. This will be a one time thing. Promise 🙃" />
     )
@@ -42,11 +45,10 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
   }
 
   function runSpellCheck() {
-    if (dictionaryManagerStatus.weHaveADictionary && !checking) {
+    if (dictionaryManager.weHaveADictionary && !checking) {
       setChecking(true);
-      getDocumentWords()
+      documentManager.getWords()
           .then(checkSpellings)
-          .then()
           .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
           .finally(() => setChecking(false));
     }
@@ -73,32 +75,9 @@ function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
   return Promise.resolve(toCheck.map(word => ({wrong: word, suggestions: ["as", "fg"]})));
 }
 
-function getDocumentWords(setDebug?) {
-  return Word.run(async context => {
-    const doc = context.document.body.getHtml();
-    await context.sync();
-    const docContent = fixAnsiUtf8Issue(doc.value);
-
-    const htmlContent = new DOMParser().parseFromString(docContent, "text/html").body.innerText;
-    if (setDebug) setDebug(docContent);
-    return unique(removeSpaces(htmlContent.toLowerCase().split(/\s+/)));
-  });
-}
-
-function unique(arr: string[]) {
-  const u = {};
-  return arr.filter((v) => {
-    return u[v] = !u.hasOwnProperty(v);
-  });
-}
-
 function uniqueWrongWords(arr: WrongWord[]) {
   const u = {};
   return arr.filter((v) => {
     return u[v.wrong] = !u.hasOwnProperty(v.wrong);
   });
-}
-
-function removeSpaces(words: string[]) {
-  return words.map(word => word.trim()).filter(word => !!word);
 }
