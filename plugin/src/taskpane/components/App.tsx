@@ -1,7 +1,7 @@
 /* global Button Header, HeroList, HeroListItem, Progress, Word */
 import * as React from "react";
 import Header from "./Header";
-import WrongWordList, {WrongWord} from "./WrongWordList";
+import WrongWordList from "./WrongWordList";
 import Progress from "./Progress";
 import {useState} from "react";
 import useInterval from "@use-it/interval";
@@ -11,6 +11,7 @@ import "../../../assets/icon-16.png";
 import "../../../assets/icon-32.png";
 import "../../../assets/icon-80.png";
 import {fixAnsiUtf8Issue} from "../../utils";
+import {WrongWord} from "./SingleWrongWord";
 
 export interface AppProps {
   title: string;
@@ -18,7 +19,6 @@ export interface AppProps {
 }
 
 export default function App({ title, isOfficeInitialized }: AppProps) {
-  const [words, setWords] = useState([]);
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
   const [checking, setChecking] = useState(false);
   const [debug] = useState("");
@@ -29,23 +29,22 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
     );
   }
 
-  function removeWord(wrongWord: string) {
+  function removeWrongWord(wrongWord: string) {
     setWrongWords(wrongWords.filter(word => word.wrong !== wrongWord));
   }
 
-  function runCheckSpelling() {
+  function runSpellCheck() {
     if (!checking) {
       setChecking(true);
-      checkSpellings(words)
-          .then(newWrongWords => {
-            setWrongWords(uniqueWrongWords([...wrongWords, ...newWrongWords]));
-          })
+      getDocumentWords()
+          .then(checkSpellings)
+          .then()
+          .then(newWrongWords => setWrongWords(uniqueWrongWords(newWrongWords)))
           .finally(() => setChecking(false));
     }
   }
 
-  useInterval(() => getWords().then(setWords), 5000);
-  useInterval(() => runCheckSpelling(), 5000);
+  useInterval(() => runSpellCheck(), 5000);
 
   return (
       <div className="ms-welcome">
@@ -54,9 +53,9 @@ export default function App({ title, isOfficeInitialized }: AppProps) {
         <WrongWordList
             message="Possible misspellings"
             recheckDisabled={checking}
-            recheck={() => getWords().then(setWords).then(runCheckSpelling)}
+            recheck={() => runSpellCheck()}
             items={wrongWords}
-            removeWord={removeWord}
+            removeWord={removeWrongWord}
         />
       </div>
   );
@@ -66,7 +65,7 @@ function checkSpellings(toCheck: string[]): Promise<WrongWord[]> {
   return Promise.resolve(toCheck.map(word => ({wrong: word, suggestions: ["as", "fg"]})));
 }
 
-function getWords(setDebug?) {
+function getDocumentWords(setDebug?) {
   return Word.run(async context => {
     const doc = context.document.body.getHtml();
     await context.sync();
