@@ -16,6 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from server.views import dictionary_version_is_latest, latest_dictionary
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('dictionary_versions/:dictionary_version_id/is_latest', dictionary_version_is_latest),
+    path('dictionaries/:language_name/versions/latest', latest_dictionary),
+
 ]
