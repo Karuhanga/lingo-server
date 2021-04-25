@@ -10,9 +10,10 @@ class Language(Model):
         return self.name
 
 
-class Word(Model):
+class AbstractWord(Model):
     class Meta:
         unique_together = ('word', 'language')
+        abstract = True
 
     word = CharField(max_length=100, null=False, db_index=True)
     language = ForeignKey(Language, on_delete=CASCADE, db_index=True)
@@ -28,6 +29,10 @@ class Word(Model):
             word=self.word,
             language=self.language.name,
         )
+
+
+class Word(AbstractWord):
+    pass
 
 
 class DictionaryVersion(Model):
@@ -50,7 +55,7 @@ class DictionaryVersion(Model):
         )
 
 
-class WordSuggestion(Word):
+class WordSuggestion(AbstractWord):
     class Meta:
         verbose_name = "Word Suggestion"
 
