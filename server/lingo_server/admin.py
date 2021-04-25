@@ -1,6 +1,7 @@
-from django.contrib.admin import ModelAdmin, register
+from django.contrib.admin import ModelAdmin, register, action
+from django.core.checks import messages
 
-from lingo_server.models import Language, Word, DictionaryVersion
+from lingo_server.models import Language, Word, DictionaryVersion, WordSuggestion
 
 
 @register(Language)
@@ -32,11 +33,51 @@ class DictionaryVersionAdmin(ModelAdmin):
         super().save_model(request, obj, form, change)
 
 
+@register(WordSuggestion)
 class WordSuggestionAdmin(ModelAdmin):
-    list_display = ('word', 'language', 'approved', 'rejected', 'created_at', 'updated_at')
+    list_display = ('word', 'language', 'was_reviewed', 'approved', 'rejected', 'created_at', 'updated_at')
+    fields = ('language', 'word', 'was_reviewed', 'approved', 'rejected', 'created_at', 'updated_at')
+    actions = ['approve', 'reject']
+
+    @action(description='Approve selected words')
+    def approve(self, request, queryset):
+        suggestions = queryset.all()
+        for suggestion in suggestions:
+            if suggestion.was_reviewed_bool():
+                return self.message_user(
+                    request, "Cannot approve already reviewed words. Please deselect them.", level=messages.ERROR
+                )
+
+        Word.objects.bulk_create(
+            [Word(word=suggestion.word, language=suggestion.language) for suggestion in suggestions],
+            ignore_conflicts=True,
+        )
+        queryset.update(approved=True)
+
+    @action(description='Reject selected words')
+    def reject(self, request, queryset):
+        suggestions = queryset.all()
+        for suggestion in suggestions:
+            if suggestion.was_reviewed_bool():
+                return self.message_user(
+                    request, "Cannot reject already reviewed words. Please deselect them.", level=messages.ERROR
+                )
+
+        queryset.update(rejected=True)
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+
+        return actions
 
     def get_readonly_fields(self, request, obj=None):
-        if obj.approved or obj.rejected:
-            return ['words', 'created_at', 'updated_at', 'language', 'approved', 'rejected']
+        if obj:
+            return ['word', 'created_at', 'updated_at', 'language', 'approved', 'rejected', 'was_reviewed']
+            # if obj.approved or obj.rejected:
+            #     return ['word', 'created_at', 'updated_at', 'language', 'approved', 'rejected']
+            # else:
+            #     return ['word', 'created_at', 'updated_at', 'language']
         else:
-            return ['words', 'created_at', 'updated_at', 'language']
+            return ['created_at', 'updated_at', 'approved', 'rejected', 'was_reviewed']

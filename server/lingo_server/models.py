@@ -51,5 +51,15 @@ class DictionaryVersion(Model):
 
 
 class WordSuggestion(Word):
-    approved = BooleanField()
-    rejected = BooleanField()
+    class Meta:
+        verbose_name = "Word Suggestion"
+
+    approved = BooleanField(null=True)
+    rejected = BooleanField(null=True)
+
+    def was_reviewed_bool(self):
+        return self.approved or self.rejected
+
+    @property
+    def was_reviewed(self):
+        return 'Yes' if self.was_reviewed_bool() else 'No'
