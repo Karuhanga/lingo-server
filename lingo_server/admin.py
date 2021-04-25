@@ -75,10 +75,6 @@ class WordSuggestionAdmin(ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['word', 'created_at', 'updated_at', 'language', 'approved', 'rejected', 'was_reviewed']
-            # if obj.approved or obj.rejected:
-            #     return ['word', 'created_at', 'updated_at', 'language', 'approved', 'rejected']
-            # else:
-            #     return ['word', 'created_at', 'updated_at', 'language']
         else:
             return ['created_at', 'updated_at', 'approved', 'rejected', 'was_reviewed']
 
