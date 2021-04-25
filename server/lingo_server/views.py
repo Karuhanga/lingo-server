@@ -1,6 +1,6 @@
 from django.http import JsonResponse, HttpRequest
 
-from server.models import DictionaryVersion
+from lingo_server.models import DictionaryVersion
 
 
 def dictionary_version_is_latest(request: HttpRequest, dictionary_id: int):

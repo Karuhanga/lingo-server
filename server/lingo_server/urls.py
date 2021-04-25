@@ -13,10 +13,11 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+
+from lingo_server.views import dictionary_version_is_latest, latest_dictionary
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include('lingo_server.urls')),
+    path('dictionary_versions/:dictionary_version_id/is_latest', dictionary_version_is_latest),
+    path('dictionaries/:language_name/versions/latest', latest_dictionary),
 ]

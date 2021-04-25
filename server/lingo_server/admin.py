@@ -1,6 +1,6 @@
 from django.contrib.admin import ModelAdmin, register
 
-from server.models import Language, Word, DictionaryVersion
+from lingo_server.models import Language, Word, DictionaryVersion
 
 
 @register(Language)
