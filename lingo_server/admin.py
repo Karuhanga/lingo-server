@@ -1,7 +1,9 @@
 from django.contrib.admin import ModelAdmin, register, action, site
 from django.core.checks import messages
+from import_export.admin import ImportExportModelAdmin
 
 from lingo_server.models import Language, Word, DictionaryVersion, WordSuggestion
+from lingo_server.resources import WordResource
 
 
 @register(Language)
@@ -10,7 +12,8 @@ class LanguageAdmin(ModelAdmin):
 
 
 @register(Word)
-class WordAdmin(ModelAdmin):
+class WordAdmin(ImportExportModelAdmin):
+    resource_class = WordResource
     list_display = ('word', 'language', 'updated_at')
 
 
