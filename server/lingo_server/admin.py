@@ -10,12 +10,18 @@ class LanguageAdmin(ModelAdmin):
 
 @register(Word)
 class WordAdmin(ModelAdmin):
-    pass
+    list_display = ('word', 'language')
 
 
 @register(DictionaryVersion)
 class DictionaryVersionAdmin(ModelAdmin):
-    readonly_fields = ('words', 'created_at', 'updated_at')
+    fields = ('language', 'words', 'created_at', 'updated_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['words', 'created_at', 'updated_at', 'language']
+        else:
+            return ['words', 'created_at', 'updated_at']
 
     def save_model(self, request, obj, form, change):
         if not change:

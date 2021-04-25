@@ -10,5 +10,5 @@ def dictionary_version_is_latest(request: HttpRequest, dictionary_id: int):
 
 
 def latest_dictionary(request, language_name: str):
-    dictionary = DictionaryVersion.objects.filter(language__name=language_name).order_by('-created_at').first()
-    return JsonResponse(dict(data=dictionary))
+    dictionary_version = DictionaryVersion.objects.filter(language__name=language_name).order_by('-created_at').first()
+    return JsonResponse(dict(data=dictionary_version.to_dict()))

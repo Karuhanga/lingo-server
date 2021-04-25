@@ -24,6 +24,9 @@ class Word(Model):
 
 
 class DictionaryVersion(Model):
+    class Meta:
+        verbose_name = "Dictionary Version"
+
     words = JSONField(null=False)
     language = ForeignKey(Language, on_delete=CASCADE, db_index=True)
     created_at = DateTimeField(auto_now_add=True)
@@ -31,3 +34,10 @@ class DictionaryVersion(Model):
 
     def __str__(self):
         return f"{self.language}/{self.created_at.strftime('%Y/%m/%d')}-{self.id}"
+
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            words=self.words,
+            language=self.language.name,
+        )

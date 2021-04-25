@@ -18,6 +18,6 @@ from django.urls import path
 from lingo_server.views import dictionary_version_is_latest, latest_dictionary
 
 urlpatterns = [
-    path('dictionary_versions/:dictionary_version_id/is_latest', dictionary_version_is_latest),
-    path('dictionaries/:language_name/versions/latest', latest_dictionary),
+    path('dictionary_versions/<int:dictionary_version_id>/is_latest', dictionary_version_is_latest),
+    path('dictionaries/<str:language_name>/versions/latest', latest_dictionary),
 ]
