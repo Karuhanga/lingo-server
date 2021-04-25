@@ -1,4 +1,4 @@
-from django.contrib.admin import ModelAdmin, register, action
+from django.contrib.admin import ModelAdmin, register, action, site
 from django.core.checks import messages
 
 from lingo_server.models import Language, Word, DictionaryVersion, WordSuggestion
@@ -81,3 +81,8 @@ class WordSuggestionAdmin(ModelAdmin):
             #     return ['word', 'created_at', 'updated_at', 'language']
         else:
             return ['created_at', 'updated_at', 'approved', 'rejected', 'was_reviewed']
+
+
+site.site_header = 'Lingo Admin'
+site.index_title = 'Lingo Admin'
+site.site_title = 'Lingo Admin'
