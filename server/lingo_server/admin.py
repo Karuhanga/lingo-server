@@ -10,7 +10,7 @@ class LanguageAdmin(ModelAdmin):
 
 @register(Word)
 class WordAdmin(ModelAdmin):
-    list_display = ('word', 'language')
+    list_display = ('word', 'language', 'updated_at')
 
 
 @register(DictionaryVersion)
@@ -30,3 +30,13 @@ class DictionaryVersionAdmin(ModelAdmin):
             ]
 
         super().save_model(request, obj, form, change)
+
+
+class WordSuggestionAdmin(ModelAdmin):
+    list_display = ('word', 'language', 'approved', 'rejected', 'created_at', 'updated_at')
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj.approved or obj.rejected:
+            return ['words', 'created_at', 'updated_at', 'language', 'approved', 'rejected']
+        else:
+            return ['words', 'created_at', 'updated_at', 'language']

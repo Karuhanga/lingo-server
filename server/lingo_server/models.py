@@ -1,4 +1,4 @@
-from django.db.models import Model, CharField, ForeignKey, JSONField, DateTimeField, CASCADE
+from django.db.models import Model, CharField, ForeignKey, JSONField, DateTimeField, CASCADE, BooleanField
 
 
 class Language(Model):
@@ -22,6 +22,13 @@ class Word(Model):
     def __str__(self):
         return self.word
 
+    def to_dict(self):
+        return dict(
+            id=self.id,
+            word=self.word,
+            language=self.language.name,
+        )
+
 
 class DictionaryVersion(Model):
     class Meta:
@@ -41,3 +48,8 @@ class DictionaryVersion(Model):
             words=self.words,
             language=self.language.name,
         )
+
+
+class WordSuggestion(Word):
+    approved = BooleanField()
+    rejected = BooleanField()
