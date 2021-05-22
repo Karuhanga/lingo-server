@@ -27,4 +27,5 @@ def load_dictionary(host, token, language_name, words_file):
         requests.post(endpoint, json=dict(words=words[at:at+batches_of]), headers=headers).raise_for_status()
         at += batches_of
 
+    print()
     print("Done 🎉")
