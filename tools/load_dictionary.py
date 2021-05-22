@@ -16,7 +16,7 @@ def load_dictionary(host, token, language_name, words_file):
     with open(words_file, "r") as file:
         words = file.read().splitlines(keepends=False)
 
-    print(words)
+    print(f"Going to add {len(words)} words...")
 
     batches_of = 500
     at = 0
