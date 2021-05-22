@@ -1,4 +1,5 @@
 import json
+from typing import List
 
 from django.http import JsonResponse, HttpRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -22,9 +23,13 @@ def latest_dictionary_version(request: HttpRequest, language_name: str):
 
 @csrf_exempt
 @require_http_methods(["POST"])
-def suggest_word(request: HttpRequest, language_name: str):
-    word = json.loads(request.body)['word']
+def suggest_words(request: HttpRequest, language_name: str):
+    words: List[str] = json.loads(request.body)['words']
     language = Language.objects.get(name=language_name)
-    word, _ = WordSuggestion.objects.get_or_create(language=language, word=word)
 
-    return JsonResponse(dict(data=word.to_dict()))
+    added_words = []
+    for word in words:
+        word, _ = WordSuggestion.objects.get_or_create(language=language, word=word)
+        added_words.append(word.to_dict())
+
+    return JsonResponse(dict(data=added_words))
