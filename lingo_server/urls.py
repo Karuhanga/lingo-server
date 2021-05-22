@@ -15,10 +15,11 @@ Including another URLconf
 """
 from django.urls import path
 
-from lingo_server.views import dictionary_version_is_latest, latest_dictionary_version, suggest_words
+from lingo_server.views import dictionary_version_is_latest, latest_dictionary_version, suggest_words, WordsView
 
 urlpatterns = [
     path('dictionaries/versions/<int:dictionary_version_id>/is_latest', dictionary_version_is_latest),
     path('languages/<str:language_name>/dictionaries/versions/latest', latest_dictionary_version),
     path('languages/<str:language_name>/suggestions', suggest_words),
+    path('languages/<str:language_name>/words', WordsView.as_view()),
 ]
